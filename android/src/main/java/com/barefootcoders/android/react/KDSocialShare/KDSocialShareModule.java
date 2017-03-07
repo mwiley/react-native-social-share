@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -60,6 +61,8 @@ public class KDSocialShareModule extends ReactContextBaseJavaModule {
       if (options.hasKey("text") && doesPackageExist("com.facebook.katana")) {
         String shareText = options.getString("text");
         shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setClassName("com.facebook.katana", "com.facebook.composer.shareintent.ImplicitShareIntentHandlerDefaultAlias");
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
       } else if (options.hasKey("link")) {
@@ -70,14 +73,14 @@ public class KDSocialShareModule extends ReactContextBaseJavaModule {
         if (options.hasKey("text") && !doesPackageExist("com.facebook.katana")) {
           callback.invoke("error", "If text is provided to Facebook sharing, the application must be installed");
         } else {
-          callback.invoke("error");
+          callback.invoke("error", "no link or text provided");
         }
         return;
       }
 
       reactContext.startActivity(shareIntent);
     } catch (Exception ex) {
-      callback.invoke("error");
+      callback.invoke("error", ex.getMessage());
     }
   }
 
