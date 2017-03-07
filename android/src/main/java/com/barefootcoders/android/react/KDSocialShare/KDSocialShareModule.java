@@ -48,6 +48,8 @@ public class KDSocialShareModule extends ReactContextBaseJavaModule {
       } else {
         tweetViaWebPopup(shareText);
       }
+      
+      callback.invoke("success");
     } catch (Exception ex) {
       callback.invoke("error");
     }
